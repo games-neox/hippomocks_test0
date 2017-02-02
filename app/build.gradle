@@ -1,0 +1,50 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion '24.0.3'
+    publishNonDefault true
+    defaultConfig {
+        applicationId 'com.gamesneox.hippomockstest0'
+        minSdkVersion 14
+        targetSdkVersion 25
+        versionCode 1
+        versionName '0.1'
+        testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
+        externalNativeBuild {
+            cmake {
+                cppFlags '-std=c++1z'
+                arguments '-DANDROID_STL=c++_static'
+            }
+        }
+        ndk {
+            abiFilters 'x86', 'armeabi-v7a', 'arm64-v8a'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            for (String taskName : project.gradle.startParameter.taskNames) {
+                if (taskName.toLowerCase().contains("test")) {
+                    path 'src/androidTest/CMakeLists.txt'
+                    return
+                }
+            }
+            path 'src/main/CMakeLists.txt'
+        }
+    }
+}
+
+project.gradle.taskGraph.whenReady {
+    connectedDebugAndroidTest {
+        ignoreFailures = true
+    }
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test:rules:0.5'
+}
